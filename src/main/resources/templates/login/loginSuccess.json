@@ -1,0 +1,12 @@
+{
+  "email": "huong.nguyen@datx.com.vn",
+  "password": "Huongnt210@",
+  "device": {
+    "name": "",
+    "platform": "pc",
+    "device_token": "",
+    "device_id_app": "",
+    "fcm_token": null,
+    "meta_data": ""
+  }
+}
