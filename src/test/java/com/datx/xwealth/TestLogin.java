@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.WindowType;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -62,7 +63,7 @@ class TestLogin {
 		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 	}
 
-//	@Test
+	@Test
 	void loginWebUI() {
 		driver.get(LOGIN_URL_UI);
 		driver.getTitle();
@@ -70,7 +71,6 @@ class TestLogin {
 
 		WebElement username = driver.findElement(By.id("focus-input"));
 		WebElement password = driver.findElement(By.id("password-input"));
-		WebElement submitButton = driver.findElement(By.id("login-button"));
 
 		try {
 			String body = readContentFileJson(PATH_LOGIN_SUCCESS);
@@ -78,9 +78,49 @@ class TestLogin {
 
 			username.sendKeys(loginRequest.getEmail());
 			password.sendKeys(loginRequest.getPassword());
+
+			WebElement submitButton = driver.findElement(By.id("login-button"));
 			submitButton.click();
 
-		} catch (JsonProcessingException e) {
+			Thread.sleep(5000);
+			WebElement submitNext = driver.findElement(By.className("gyDlZf"));
+			submitNext.click();
+
+			Thread.sleep(5000);
+			WebElement submitProduct = driver.findElement(By.className("fHCplw"));
+			submitProduct.click();
+
+			Thread.sleep(5000);
+			WebElement submitBuy = driver.findElement(By.className("iEObwT"));
+			submitBuy.click();
+
+			Thread.sleep(5000);
+			WebElement submitOrder = driver.findElement(By.className("bDxKUR"));
+			submitOrder.click();
+
+			driver.getWindowHandles().forEach(tab -> driver.switchTo().window(tab));
+
+			Thread.sleep(8000);
+			WebElement submitPay = driver.findElement(By.className("gZxKoD"));
+			submitPay.click();
+
+			Thread.sleep(8000);
+			WebElement submitNCBPay = driver.findElement(By.id("NCB"));
+			submitNCBPay.click();
+
+			WebElement enterCardNumber = driver.findElement(By.id("card_number_mask"));
+			enterCardNumber.sendKeys("9704198526191432198");
+
+			WebElement enterCardHolder = driver.findElement(By.id("cardHolder"));
+			enterCardHolder.sendKeys("NGUYEN VAN A");
+
+			WebElement enterCardDate = driver.findElement(By.id("cardDate"));
+			enterCardDate.sendKeys("07/15");
+
+			WebElement btnContinue = driver.findElement(By.id("btnContinue"));
+			btnContinue.click();
+
+		} catch (JsonProcessingException | InterruptedException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -169,6 +209,6 @@ class TestLogin {
 
 	@AfterAll
 	static void exist() {
-		driver.quit();
+//		driver.quit();
 	}
 }
