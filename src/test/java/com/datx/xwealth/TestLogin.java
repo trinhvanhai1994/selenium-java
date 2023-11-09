@@ -1,8 +1,10 @@
 package com.datx.xwealth;
 
+import com.datx.xwealth.Utils.DateUtils;
 import com.datx.xwealth.Utils.HttpUtils;
 import com.datx.xwealth.model.login.LoginRequest;
 import com.datx.xwealth.model.login.LoginResponse;
+import com.datx.xwealth.model.login.RecommendBotResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,16 +27,21 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.Objects;
 
 @SpringBootTest
 class TestLogin {
 	private static final String LOGIN_URL_UI = "https://dev-xwealth.datxasia.com/";
 	private static final String LOGIN_URL_API = "https://dev-api.datxasia.com/api/auth/login";
+	private static final String ROOT_GRAPHQL_API = "https://core.datx.vn/graphql";
 
 	// File path json data
 	private static final String PATH_LOGIN_SUCCESS = "templates/login/loginSuccess.json";
 	private static final String PATH_LOGIN_FAIL = "templates/login/loginFail.json";
+
+	private static final String PATH_RECOMMEND_BOT = "templates/login/getRecommendBot.json";
 	private static final String PATH_LOGIN_EMAIL_INCORRECT = "templates/login/loginEmailIncorrect.json";
 	private static final String PATH_LOGIN_PASSWORD_INCORRECT = "templates/login/loginPasswordIncorrect.json";
 
@@ -66,8 +73,9 @@ class TestLogin {
 	@Test
 	void loginWebUI() {
 		driver.get(LOGIN_URL_UI);
-		driver.getTitle();
-		driver.manage().timeouts().implicitlyWait(Duration.ofMillis(500));
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(20));
+		driver.manage().timeouts().scriptTimeout(Duration.ofSeconds(20));
+		driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(20));
 
 		WebElement username = driver.findElement(By.id("focus-input"));
 		WebElement password = driver.findElement(By.id("password-input"));
@@ -82,31 +90,25 @@ class TestLogin {
 			WebElement submitButton = driver.findElement(By.id("login-button"));
 			submitButton.click();
 
-			Thread.sleep(5000);
 			WebElement submitNext = driver.findElement(By.className("gyDlZf"));
 			submitNext.click();
 
-			Thread.sleep(5000);
 			WebElement submitProduct = driver.findElement(By.className("fHCplw"));
 			submitProduct.click();
 
-			Thread.sleep(5000);
 			WebElement submitBuy = driver.findElement(By.className("iEObwT"));
 			submitBuy.click();
 
-			Thread.sleep(5000);
 			WebElement submitOrder = driver.findElement(By.className("bDxKUR"));
 			submitOrder.click();
 
 			driver.getWindowHandles().forEach(tab -> driver.switchTo().window(tab));
 
-			Thread.sleep(8000);
 			WebElement submitPay = driver.findElement(By.className("gZxKoD"));
 			submitPay.click();
 
-			Thread.sleep(8000);
 			WebElement submitNCBPay = driver.findElement(By.id("NCB"));
-			submitNCBPay.click();
+			submitNCBPay.submit();
 
 			WebElement enterCardNumber = driver.findElement(By.id("card_number_mask"));
 			enterCardNumber.sendKeys("9704198526191432198");
@@ -120,7 +122,7 @@ class TestLogin {
 			WebElement btnContinue = driver.findElement(By.id("btnContinue"));
 			btnContinue.click();
 
-		} catch (JsonProcessingException | InterruptedException e) {
+		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -207,8 +209,38 @@ class TestLogin {
 		}
 	}
 
+	@Test
+	void checkClose() {
+		try {
+			String body = readContentFileJson(PATH_RECOMMEND_BOT);
+			String responseBody = HttpUtils.getResponseApi(ROOT_GRAPHQL_API, body);
+			RecommendBotResponse recommendBotResponse = mapper.readValue(responseBody, RecommendBotResponse.class);
+			if (Objects.isNull(recommendBotResponse)) {
+				Assertions.fail("Input data correct format! please");
+			}
+
+			RecommendBotResponse.Root data = recommendBotResponse.getData();
+			ArrayList<RecommendBotResponse.RecommendationBot> recommendationBot = data.getRecommendationBot();
+			recommendationBot.forEach(bot -> {
+				String ticker = bot.getTicker();
+				Date dateSell = DateUtils.convertStringToDate(bot.getDate());
+				Date dateClose = DateUtils.addDate(-6);
+				if (dateClose.after(dateSell) && !"close".equals(bot.getStatus())) {
+					System.out.println("Error when not close" + ticker);
+				}
+
+				if (bot.getProfitPercent() > 10 && !"close".equals(bot.getStatus())) {
+					System.out.println("Error when not close" + ticker);
+				}
+			});
+
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	@AfterAll
 	static void exist() {
-//		driver.quit();
+		driver.quit();
 	}
 }
