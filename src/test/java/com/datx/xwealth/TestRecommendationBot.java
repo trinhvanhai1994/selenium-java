@@ -9,15 +9,11 @@ import com.datx.xwealth.model.RecommendBot.RecommendBotResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.bonigarcia.wdm.WebDriverManager;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.CollectionUtils;
@@ -34,32 +30,15 @@ public class TestRecommendationBot extends BaseFunctionTest {
     @Value("${xwealth.datx.api.root}")
     private String ROOT_GRAPHQL_API;
 
-    private static WebDriver driver;
     private static final ObjectMapper mapper = new ObjectMapper();
 
     @BeforeAll
     static void setup() {
-        WebDriverManager.chromedriver().setup();
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("start-maximized"); // open Browser in maximized mode
-        options.addArguments("disable-infobars"); // disabling infobars
-        options.addArguments("--disable-extensions"); // disabling extensions
-        options.addArguments("--disable-gpu"); // applicable to Windows os only
-        options.addArguments("--disable-dev-shm-usage"); // overcome limited resource problems
-        options.addArguments("--no-sandbox"); // Bypass OS security model
-        options.addArguments("--disable-in-process-stack-traces");
-        options.addArguments("--disable-logging");
-        options.addArguments("--log-level=3");
-        options.addArguments("--remote-allow-origins=*");
-
-        driver = new ChromeDriver(options);
-
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
     @Test
     void testRecommendBot() {
-        driver.quit();
         log.info("=============== Start test RecommendationBot ===============");
         int offset = 0;
         while (true) {
@@ -142,6 +121,6 @@ public class TestRecommendationBot extends BaseFunctionTest {
 
     @AfterAll
     static void exist() {
-        driver.quit();
+        //TODO
     }
 }
