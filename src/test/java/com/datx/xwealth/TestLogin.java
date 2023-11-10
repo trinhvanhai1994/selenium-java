@@ -1,10 +1,6 @@
 package com.datx.xwealth;
 
-import com.datx.xwealth.Utils.JsonUtils;
-import com.datx.xwealth.constant.PathConstant;
-import com.datx.xwealth.model.login.LoginRequest;
 import com.datx.xwealth.model.login.LoginResponse;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.bonigarcia.wdm.WebDriverManager;
@@ -26,6 +22,12 @@ class TestLogin extends BaseFunctionTest {
 
 	@Value("${xwealth.datx.url.root}")
 	private String LOGIN_URL_UI;
+
+	@Value("${xwealth.datx.account.email}")
+	private String ACCOUNT_EMAIL;
+
+	@Value("${xwealth.datx.account.password}")
+	private String ACCOUNT_PASSWORD;
 
 	private static WebDriver driver;
 	private static final ObjectMapper mapper = new ObjectMapper();
@@ -61,51 +63,43 @@ class TestLogin extends BaseFunctionTest {
 		WebElement username = driver.findElement(By.id("focus-input"));
 		WebElement password = driver.findElement(By.id("password-input"));
 
-		try {
-			String body = JsonUtils.readContentFileJson(PathConstant.PATH_LOGIN_JSON_FORMAT);
-			LoginRequest loginRequest = mapper.readValue(body, LoginRequest.class);
+		username.sendKeys(ACCOUNT_EMAIL);
+		password.sendKeys(ACCOUNT_PASSWORD);
 
-			username.sendKeys(loginRequest.getEmail());
-			password.sendKeys(loginRequest.getPassword());
+		WebElement submitButton = driver.findElement(By.id("login-button"));
+		submitButton.click();
 
-			WebElement submitButton = driver.findElement(By.id("login-button"));
-			submitButton.click();
+		WebElement submitNext = driver.findElement(By.className("gyDlZf"));
+		submitNext.click();
 
-			WebElement submitNext = driver.findElement(By.className("gyDlZf"));
-			submitNext.click();
+		WebElement submitProduct = driver.findElement(By.className("fHCplw"));
+		submitProduct.click();
 
-			WebElement submitProduct = driver.findElement(By.className("fHCplw"));
-			submitProduct.click();
+		WebElement submitBuy = driver.findElement(By.className("iEObwT"));
+		submitBuy.click();
 
-			WebElement submitBuy = driver.findElement(By.className("iEObwT"));
-			submitBuy.click();
+		WebElement submitOrder = driver.findElement(By.className("bDxKUR"));
+		submitOrder.click();
 
-			WebElement submitOrder = driver.findElement(By.className("bDxKUR"));
-			submitOrder.click();
+		driver.getWindowHandles().forEach(tab -> driver.switchTo().window(tab));
 
-			driver.getWindowHandles().forEach(tab -> driver.switchTo().window(tab));
+		WebElement submitPay = driver.findElement(By.className("gZxKoD"));
+		submitPay.click();
 
-			WebElement submitPay = driver.findElement(By.className("gZxKoD"));
-			submitPay.click();
+		WebElement submitNCBPay = driver.findElement(By.id("NCB"));
+		submitNCBPay.submit();
 
-			WebElement submitNCBPay = driver.findElement(By.id("NCB"));
-			submitNCBPay.submit();
+		WebElement enterCardNumber = driver.findElement(By.id("card_number_mask"));
+		enterCardNumber.sendKeys("9704198526191432198");
 
-			WebElement enterCardNumber = driver.findElement(By.id("card_number_mask"));
-			enterCardNumber.sendKeys("9704198526191432198");
+		WebElement enterCardHolder = driver.findElement(By.id("cardHolder"));
+		enterCardHolder.sendKeys("NGUYEN VAN A");
 
-			WebElement enterCardHolder = driver.findElement(By.id("cardHolder"));
-			enterCardHolder.sendKeys("NGUYEN VAN A");
+		WebElement enterCardDate = driver.findElement(By.id("cardDate"));
+		enterCardDate.sendKeys("07/15");
 
-			WebElement enterCardDate = driver.findElement(By.id("cardDate"));
-			enterCardDate.sendKeys("07/15");
-
-			WebElement btnContinue = driver.findElement(By.id("btnContinue"));
-			btnContinue.click();
-
-		} catch (JsonProcessingException e) {
-			throw new RuntimeException(e);
-		}
+		WebElement btnContinue = driver.findElement(By.id("btnContinue"));
+		btnContinue.click();
 	}
 
 	@Test

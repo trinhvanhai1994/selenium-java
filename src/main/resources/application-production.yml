@@ -2,7 +2,7 @@
 xwealth:
   datx:
     url:
-      root: https://dev-xwealth.datxasia.com/
+      root: https://xwealth.datx.vn/
     api:
       login: https://api.datx.vn/api/auth/login
       root: https://core.datx.vn/graphql
