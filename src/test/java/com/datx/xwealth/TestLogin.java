@@ -62,7 +62,7 @@ class TestLogin extends BaseFunctionTest {
 		WebElement password = driver.findElement(By.id("password-input"));
 
 		try {
-			String body = JsonUtils.readContentFileJson(PathConstant.PATH_LOGIN_SUCCESS);
+			String body = JsonUtils.readContentFileJson(PathConstant.PATH_LOGIN_JSON_FORMAT);
 			LoginRequest loginRequest = mapper.readValue(body, LoginRequest.class);
 
 			username.sendKeys(loginRequest.getEmail());

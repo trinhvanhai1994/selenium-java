@@ -6,4 +6,7 @@ xwealth:
     api:
       login: https://dev-api.datxasia.com/api/auth/login
       root: https://dev-core.datxasia.com/graphql
+    account:
+      email: huong.nguyen@datx.com.vn
+      password: Huongnt210@
 

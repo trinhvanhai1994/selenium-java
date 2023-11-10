@@ -1,4 +1,4 @@
-# List API
+# xwealth information
 xwealth:
   datx:
     url:
@@ -6,5 +6,8 @@ xwealth:
     api:
       login: https://api.datx.vn/api/auth/login
       root: https://core.datx.vn/graphql
+    account:
+      email: huong.nguyen@datx.com.vn
+      password: Pickgunny123@
 
 

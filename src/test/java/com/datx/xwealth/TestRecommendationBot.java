@@ -59,7 +59,8 @@ public class TestRecommendationBot extends BaseFunctionTest {
     }
 
     @Test
-    void checkClose() {
+    void testRecommendBot() {
+        driver.quit();
         log.info("=============== Start test RecommendationBot ===============");
         int offset = 0;
         while (true) {
@@ -119,7 +120,7 @@ public class TestRecommendationBot extends BaseFunctionTest {
 
     private List<RecommendBotResponse.RecommendationBot> getListRecommendByPage(int offset) {
         try {
-            String bodyDefault = JsonUtils.readContentFileJson(PathConstant.PATH_RECOMMEND_BOT);
+            String bodyDefault = JsonUtils.readContentFileJson(PathConstant.PATH_RECOMMEND_BOT_JSON_FORMAT);
 
             String defaultOffset = "\"offset\":0";
             String newOffset = String.format("\"offset\":%s", offset);
