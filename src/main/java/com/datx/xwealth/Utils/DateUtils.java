@@ -23,8 +23,4 @@ public class DateUtils {
             throw new RuntimeException(e);
         }
     }
-
-    public static void main(String[] args) {
-        System.out.println(addDate(2));
-    }
 }

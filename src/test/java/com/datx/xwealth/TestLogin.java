@@ -1,49 +1,31 @@
 package com.datx.xwealth;
 
-import com.datx.xwealth.Utils.DateUtils;
-import com.datx.xwealth.Utils.HttpUtils;
+import com.datx.xwealth.Utils.JsonUtils;
+import com.datx.xwealth.constant.PathConstant;
 import com.datx.xwealth.model.login.LoginRequest;
 import com.datx.xwealth.model.login.LoginResponse;
-import com.datx.xwealth.model.login.RecommendBotResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.bonigarcia.wdm.WebDriverManager;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.WindowType;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Objects;
 
 @SpringBootTest
-class TestLogin {
-	private static final String LOGIN_URL_UI = "https://dev-xwealth.datxasia.com/";
-	private static final String LOGIN_URL_API = "https://dev-api.datxasia.com/api/auth/login";
-	private static final String ROOT_GRAPHQL_API = "https://core.datx.vn/graphql";
+class TestLogin extends BaseFunctionTest {
 
-	// File path json data
-	private static final String PATH_LOGIN_SUCCESS = "templates/login/loginSuccess.json";
-	private static final String PATH_LOGIN_FAIL = "templates/login/loginFail.json";
-
-	private static final String PATH_RECOMMEND_BOT = "templates/login/getRecommendBot.json";
-	private static final String PATH_LOGIN_EMAIL_INCORRECT = "templates/login/loginEmailIncorrect.json";
-	private static final String PATH_LOGIN_PASSWORD_INCORRECT = "templates/login/loginPasswordIncorrect.json";
+	@Value("${xwealth.datx.url.root}")
+	private String LOGIN_URL_UI;
 
 	private static WebDriver driver;
 	private static final ObjectMapper mapper = new ObjectMapper();
@@ -53,7 +35,6 @@ class TestLogin {
 	static void setup() {
 		WebDriverManager.chromedriver().setup();
 		ChromeOptions options = new ChromeOptions();
-		options.setHeadless(false);
 		options.addArguments("start-maximized"); // open Browser in maximized mode
 		options.addArguments("disable-infobars"); // disabling infobars
 		options.addArguments("--disable-extensions"); // disabling extensions
@@ -81,7 +62,7 @@ class TestLogin {
 		WebElement password = driver.findElement(By.id("password-input"));
 
 		try {
-			String body = readContentFileJson(PATH_LOGIN_SUCCESS);
+			String body = JsonUtils.readContentFileJson(PathConstant.PATH_LOGIN_SUCCESS);
 			LoginRequest loginRequest = mapper.readValue(body, LoginRequest.class);
 
 			username.sendKeys(loginRequest.getEmail());
@@ -128,119 +109,13 @@ class TestLogin {
 	}
 
 	@Test
-	void loginSuccess() {
-		try {
-			String body = readContentFileJson(PATH_LOGIN_SUCCESS);
-			String responseBody = HttpUtils.getResponseApi(LOGIN_URL_API, body);
-			LoginResponse loginResponse = mapper.readValue(responseBody, LoginResponse.class);
-			if (Objects.isNull(loginResponse)) {
-				Assertions.fail("Input data correct format! please");
-			}
-
-			LoginResponse.Data data = loginResponse.getData();
-			if (data != null && !loginResponse.status) {
-				Assertions.assertTrue(data.deviceLimitReached);
-			} else {
-				Assertions.assertTrue(loginResponse.isStatus());
-			}
-
-		} catch (JsonProcessingException e) {
-			throw new RuntimeException(e);
+	void loginApiSuccess() {
+		LoginResponse loginResponse = getLoginInfo();
+		LoginResponse.Data data = loginResponse.getData();
+		if (data != null && !loginResponse.status) {
+			Assertions.assertTrue(data.deviceLimitReached);
+		} else {
+			Assertions.assertTrue(loginResponse.isStatus());
 		}
-	}
-
-	@Test
-	void loginFail() {
-		try {
-			String body = readContentFileJson(PATH_LOGIN_FAIL);
-			String responseBody = HttpUtils.getResponseApi(LOGIN_URL_API, body);
-			LoginResponse loginResponse = mapper.readValue(responseBody, LoginResponse.class);
-			if (Objects.isNull(loginResponse)) {
-				Assertions.fail("Input data correct format! please");
-			}
-
-			Assertions.assertFalse(loginResponse.status);
-		} catch (JsonProcessingException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@Test
-	void loginEnterEmailIncorrect() {
-		try {
-			String body = readContentFileJson(PATH_LOGIN_EMAIL_INCORRECT);
-			String responseBody = HttpUtils.getResponseApi(LOGIN_URL_API, body);
-			LoginResponse loginResponse = mapper.readValue(responseBody, LoginResponse.class);
-			if (Objects.isNull(loginResponse)) {
-				Assertions.fail("Input data correct format! please");
-			}
-
-			int errorCodeUsername = 110;
-			Assertions.assertEquals(errorCodeUsername, loginResponse.getErrorCode());
-		} catch (JsonProcessingException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@Test
-	void loginEnterPasswordIncorrect() {
-		try {
-			String body = readContentFileJson(PATH_LOGIN_PASSWORD_INCORRECT);
-			String responseBody = HttpUtils.getResponseApi(LOGIN_URL_API, body);
-			LoginResponse loginResponse = mapper.readValue(responseBody, LoginResponse.class);
-			if (Objects.isNull(loginResponse)) {
-				Assertions.fail("Input data correct format! please");
-			}
-
-			int errorCodeUsername = 199;
-			Assertions.assertEquals(errorCodeUsername, loginResponse.getErrorCode());
-		} catch (JsonProcessingException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	private String readContentFileJson(String path) {
-		try {
-			Resource companyDataResource = new ClassPathResource(path);
-			File file = companyDataResource.getFile();
-			return new String(Files.readAllBytes(file.toPath()));
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@Test
-	void checkClose() {
-		try {
-			String body = readContentFileJson(PATH_RECOMMEND_BOT);
-			String responseBody = HttpUtils.getResponseApi(ROOT_GRAPHQL_API, body);
-			RecommendBotResponse recommendBotResponse = mapper.readValue(responseBody, RecommendBotResponse.class);
-			if (Objects.isNull(recommendBotResponse)) {
-				Assertions.fail("Input data correct format! please");
-			}
-
-			RecommendBotResponse.Root data = recommendBotResponse.getData();
-			ArrayList<RecommendBotResponse.RecommendationBot> recommendationBot = data.getRecommendationBot();
-			recommendationBot.forEach(bot -> {
-				String ticker = bot.getTicker();
-				Date dateSell = DateUtils.convertStringToDate(bot.getDate());
-				Date dateClose = DateUtils.addDate(-6);
-				if (dateClose.after(dateSell) && !"close".equals(bot.getStatus())) {
-					System.out.println("Error when not close" + ticker);
-				}
-
-				if (bot.getProfitPercent() > 10 && !"close".equals(bot.getStatus())) {
-					System.out.println("Error when not close" + ticker);
-				}
-			});
-
-		} catch (JsonProcessingException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@AfterAll
-	static void exist() {
-		driver.quit();
 	}
 }

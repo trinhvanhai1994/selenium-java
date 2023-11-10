@@ -1,9 +1,9 @@
-package com.datx.xwealth.model.login;
+package com.datx.xwealth.model.RecommendBot;
 
 import lombok.Data;
 
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Data
 public class RecommendBotResponse {
@@ -11,7 +11,7 @@ public class RecommendBotResponse {
 
     @Data
     public static class Root {
-        private ArrayList<RecommendationBot> recommendationBot;
+        private List<RecommendationBot> recommendationBot;
     }
 
     @Data

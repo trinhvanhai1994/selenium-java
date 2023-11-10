@@ -1,0 +1,9 @@
+# List API
+xwealth:
+  datx:
+    url:
+      root: https://dev-xwealth.datxasia.com/
+    api:
+      login: https://dev-api.datxasia.com/api/auth/login
+      root: https://dev-core.datxasia.com/graphql
+
