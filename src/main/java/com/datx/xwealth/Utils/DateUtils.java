@@ -16,6 +16,18 @@ public class DateUtils {
         return calendar.getTime();
     }
 
+    public static Date addDate(Date date, int dateAdd) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.DATE, dateAdd);
+
+        return calendar.getTime();
+    }
+
+    public static Date now() {
+        return new Date();
+    }
+
     public static Date convertStringToDate(String dateString) {
         try {
             return new SimpleDateFormat("yyyy-MM-dd").parse(dateString);
