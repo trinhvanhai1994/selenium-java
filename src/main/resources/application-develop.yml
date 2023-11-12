@@ -10,3 +10,17 @@ xwealth:
       email: huong.nguyen@datx.com.vn
       password: Huongnt210@
 
+spring:
+  data:
+    mongodb:
+        middleWare:
+          uri: mongodb://datx:bQpavEUUtHrHYmnCHnnNzrt6@localhost:27018/middleware_dev_01?authSource=middleware_dev_01&directConnection=true
+        sale:
+          uri: mongodb://dev_sales_portal_write:*****@127.0.0.1:27018/dev_sales_portal&authSource=dev_sales_portal&directConnection=true
+        order:
+          uri: mongodb://dev_order_manage_write:*****@localhost:27018/dev_order_manage?&authSource=dev_order_manage&directConnection=true
+#      uri: mongodb://datx:bQpavEUUtHrHYmnCHnnNzrt6@localhost:27018/?authSource=middleware_dev_01&directConnection=true
+#      host: localhost
+#      database: middleware_dev_01
+#      port: 27018
+

@@ -1,11 +1,12 @@
 package com.datx.xwealth;
 
+import com.datx.xwealth.model.JwtTokenInfo;
 import com.datx.xwealth.model.login.LoginResponse;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.bonigarcia.wdm.WebDriverManager;
+import org.junit.Before;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -32,9 +33,8 @@ class TestLogin extends BaseFunctionTest {
 	private static WebDriver driver;
 	private static final ObjectMapper mapper = new ObjectMapper();
 
-
-	@BeforeAll
-	static void setup() {
+	@Before
+	public void setup() {
 		WebDriverManager.chromedriver().setup();
 		ChromeOptions options = new ChromeOptions();
 		options.addArguments("start-maximized"); // open Browser in maximized mode
@@ -106,6 +106,7 @@ class TestLogin extends BaseFunctionTest {
 	void loginApiSuccess() {
 		LoginResponse loginResponse = getLoginInfo();
 		LoginResponse.Data data = loginResponse.getData();
+
 		if (data != null && !loginResponse.status) {
 			Assertions.assertTrue(data.deviceLimitReached);
 		} else {
